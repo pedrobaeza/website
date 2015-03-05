@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="assets_frontend" inherit_id="website.assets_frontend" name="Collapse product categories assets">
+            <xpath expr="." position="inside">
+                <link rel='stylesheet' href='/website_sale_collapse_categories/static/src/css/website_sale.css'/>
+                <script type="text/javascript" src="/website_sale_collapse_categories/static/src/js/website_sale.js"/>
+            </xpath>
+        </template>
+
+        <template id="collapse_categories_recursive" name="Collapse product category list">
+            <li t-att-class="'active' if c.id == int(category or 0) else ''">
+                <i t-if="c.child_id" t-attf-class="fa #{'fa-chevron-down' if c.id in parent_category else 'fa-chevron-right'}"/> <a t-att-href="keep('/shop/category/' + slug(c), category=0)" t-field="c.name"/>
+                <ul t-if="c.child_id" class="nav nav-pills nav-stacked nav-hierarchy" t-att-style="'display:block;' if c.id in parent_category else 'display:none;'">
+                    <t t-foreach="c.child_id" t-as="c">
+                        <t t-call="website_sale_collapse_categories.collapse_categories_recursive"/>
+                    </t>
+                </ul>
+            </li>
+        </template>
+
+        <template id="collapse_products_categories" inherit_id="website_sale.products_categories" active="False" customize_show="True" name="Collapse product categories">
+            <xpath expr="//div[@id='products_grid_before']/ul" position="replace">
+                <ul class="nav nav-pills nav-stacked mt16" id="collapse_category">
+                    <li t-att-class=" '' if category else 'active' "><a t-att-href="keep('/shop',category=0)">All Products</a></li>
+                    <t t-foreach="categories" t-as="c">
+                        <t t-call="website_sale_collapse_categories.collapse_categories_recursive"/>
+                    </t>
+                </ul>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>

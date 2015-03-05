@@ -1,0 +1,9 @@
+#collapse_category li a{
+  display: inline-block;
+  width: 12vw;
+  padding-left: 3px;
+  margin-left: 3px;
+}
+#collapse_category li i.fa{
+  cursor: pointer;
+}
