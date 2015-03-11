@@ -17,6 +17,8 @@ You have two options for events:
 
 * Don't put any type of ticket, so the event will be considered as free, and
   the registration screen of *website_event_register_free* module will appear.
+  *Warning:* This doesn't work for now due to a bug in Odoo that doesn't allow
+  to store max seats available.
 * Define ticket types, but let one or some of the tickets with price 0. When
   you go to normal registration screen, the tickets with price will be added
   to shopping cart, and the priceless tickets will be automatically registered.
@@ -25,8 +27,7 @@ You have two options for events:
 
 Known issues / Roadmap
 ======================
-* When you mix free and paid tickets, a better flow would be to present
-  checkout screen, and use same data for the free registration.
+* Hide on checkout page the fields that are not needed for free events.
 
 Credits
 =======

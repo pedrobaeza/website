@@ -25,7 +25,7 @@
               "Antiun Ingeniería S.L.",
     "license": "AGPL-3",
     "category": "Website",
-    "summary": "Avoid shopping cart when registering free tickets on events",
+    "summary": "Combine free and paid tickets on events",
     "depends": [
         'website_event_register_free',
         'website_event_sale',
