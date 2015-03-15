@@ -21,8 +21,8 @@
 from openerp import http, fields
 from openerp.http import request
 from openerp.addons.website_sale.controllers.main import website_sale
-from openerp.addons.website_event_register_free.\
-    controllers.website_event import WebsiteEvent
+from openerp.addons.website_event_register_free.controllers.website_event \
+    import WebsiteEvent
 
 
 class WebsiteSale(website_sale):
@@ -46,17 +46,6 @@ class WebsiteSale(website_sale):
                 data))
         return errors
 
-    def _prepare_event_registration(self, session, post):
-        return {
-            'origin': 'Website',
-            'nb_register': int(session['free_tickets']),
-            'event_id': session['event_id'],
-            'date_open': fields.Datetime.now(),
-            'email': post['email'],
-            'phone': post['phone'],
-            'name': post['name']
-        }
-
     @http.route(['/shop/confirm_order'], type='http', auth="public",
                 website=True)
     def confirm_order(self, **post):
@@ -65,8 +54,21 @@ class WebsiteSale(website_sale):
             values['error'] = self.checkout_form_validate(post)
             if values["error"]:
                 return request.website.render("website_sale.checkout", values)
-            registration = request.env['event.registration'].sudo().create(
-                self._prepare_event_registration(request.session, post))
+            post['tickets'] = request.session['free_tickets']
+            event = request.env['event.event'].browse(
+                request.session['event_id'])
+            if (http.request.env.ref('base.public_user') !=
+                    http.request.env.user):
+                partner_id = http.request.env.user.partner_id.id
+            else:
+                partner_id = False
+            # Use same hook as without website_sale
+            reg_obj = http.request.env['event.registration']
+            registration_vals = reg_obj._prepare_registration(
+                event, post, http.request.env.user.id, partner_id=partner_id)
+            registration = reg_obj.sudo().create(registration_vals)
+            if registration.partner_id:
+                registration._onchange_partner()
             registration.registration_open()
         if request.session.get('has_paid_tickets'):
             return super(WebsiteSale, self).confirm_order(**post)
