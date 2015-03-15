@@ -46,19 +46,23 @@ class WebsiteSale(website_sale):
                 data))
         return errors
 
+    def _prepare_event_registration(self, session, post):
+        return {
+            'origin': 'Website',
+            'nb_register': int(session['free_tickets']),
+            'event_id': session['event_id'],
+            'date_open': fields.Datetime.now(),
+            'email': post['email'],
+            'phone': post['phone'],
+            'name': post['name']
+        }
+
     @http.route(['/shop/confirm_order'], type='http', auth="public",
                 website=True)
     def confirm_order(self, **post):
         if request.session.get('free_tickets'):
             registration = request.env['event.registration'].sudo().create(
-                {'origin': 'Website',
-                 'nb_register': int(request.session['free_tickets']),
-                 'event_id': request.session['event_id'],
-                 'date_open': fields.Datetime.now(),
-                 'email': post['email'],
-                 'phone': post['phone'],
-                 'name': post['name']}
-            )
+                self._prepare_event_registration(request.session, post))
             registration.registration_open()
         if request.session.get('has_paid_tickets'):
             return super(WebsiteSale, self).confirm_order(**post)
