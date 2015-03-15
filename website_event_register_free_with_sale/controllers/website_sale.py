@@ -61,16 +61,16 @@ class WebsiteSale(website_sale):
                 website=True)
     def confirm_order(self, **post):
         if request.session.get('free_tickets'):
+            values = self.checkout_values(post)
+            values['error'] = self.checkout_form_validate(post)
+            if values["error"]:
+                return request.website.render("website_sale.checkout", values)
             registration = request.env['event.registration'].sudo().create(
                 self._prepare_event_registration(request.session, post))
             registration.registration_open()
         if request.session.get('has_paid_tickets'):
             return super(WebsiteSale, self).confirm_order(**post)
         else:
-            values = self.checkout_values(post)
-            values['error'] = self.checkout_form_validate(post)
-            if values["error"]:
-                return request.website.render("website_sale.checkout", values)
             return http.request.render(
                 'website_event_register_free.partner_register_confirm',
                 {'registration': registration})
