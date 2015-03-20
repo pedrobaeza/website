@@ -18,7 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import http, fields
+from openerp import http
 from openerp.http import request
 from openerp.addons.website_sale.controllers.main import website_sale
 from openerp.addons.website_event_register_free.controllers.website_event \
@@ -73,6 +73,7 @@ class WebsiteSale(website_sale):
         if request.session.get('has_paid_tickets'):
             return super(WebsiteSale, self).confirm_order(**post)
         else:
+            request.website.sale_get_order().unlink()
             return http.request.render(
                 'website_event_register_free.partner_register_confirm',
                 {'registration': registration})
