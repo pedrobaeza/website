@@ -28,6 +28,7 @@ class WebsiteEvent(website_event):
                 methods=['POST'], website=True)
     def cart_update(self, **post):
         has_paid_tickets = False
+        post['free_tickets'] = 0
         for key, value in post.items():
             qty = int(value or "0")
             ticket_words = key.split("-")
@@ -39,7 +40,7 @@ class WebsiteEvent(website_event):
             if not ticket.price:
                 # Accumulate possible multiple free tickets
                 post['free_tickets'] = (
-                    str(int(post.get('free_tickets', '0')) + qty))
+                    str(int(post['free_tickets']) + qty))
             else:
                 has_paid_tickets = True
                 # Add to shopping cart the rest of the items
